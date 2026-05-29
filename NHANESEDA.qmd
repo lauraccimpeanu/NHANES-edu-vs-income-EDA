@@ -1,0 +1,102 @@
+---
+title: "Draft Report: Laura Cimpeanu"
+format: docx
+editor: visual
+echo: false 
+---
+
+![](images/clipboard-1227717430.png)
+
+## Background/Motivation for the Study
+
+From the beginning of our schooling journey, most people are told as they advance their education, their salaries would increase with those advancements. Pursuing further education would unlock increased financial stability, ideally, therefore setting money and time aside for school is seen as an investment. The unemployment rates and earnings categorized by educational attainment report that the median weekly earning is \$930 with a 4.2% unemployment rate for those with a high school degree (U.S. Bureau of Labor Statistics, 2025). For those with a doctoral degree, a median weekly earning of \$2278 and an unemployment rate of 1.2% was reported by the U.S. Department of Labor.
+
+The time and money set aside for higher education can come with a compromise that weighs harder for those that do not come from households that have a sufficient economic foundation, which gives an uneven playing field compared to those that can pursue the next level of education readily after each education milestone. That is why it is important to evaluate the accuracy of this belief.
+
+## Research Question and Hypothesis
+
+The goal of this study is to explore the extent household income can be predicted based off the amount of education attained.
+
+Null hypothesis: Education attained has no impact on household income.
+
+Alternative hypothesis: The level of education completed impacts household income.
+
+The prediction is that the more the educational milestones reached, the higher the household income. Education level and household income will be compared.
+
+## Data Description and Exploratory Data Analysis
+
+Read in the data. You might want to consider filtering the dataset to only include the targeted variables. Identify targeted variables HERE.
+
+```{r}
+library(NHANES)
+library(tidyverse)
+library(mosaic)
+View(NHANES)
+
+#filter for HHIncomeMid and Education
+NHANES_mod <- NHANES %>% 
+  select(HHIncomeMid, Education) %>% 
+  filter(!is.na(HHIncomeMid), !is.na(Education))
+
+```
+
+The following variables will be studied and have all been reported from the US National Health and Examination Study (Pruim, 2015).
+
+**Education**: Participants of 20+ years reported if they completed grade school, high school, some college, or are graduated from college. This value is categorical and there are five categories.
+
+**HHIncomeMid**: Middle of the HHIncome ranges in order to display a numerical value. Means of income values will be compared.
+
+```{r}
+#Basic summary
+favstats(NHANES_mod$HHIncomeMid)
+
+#Summary categorized by education level
+favstats(HHIncomeMid ~ Education, data = NHANES_mod)
+```
+
+The sample size for the study is 6622 participants for those surveyed for their household income (USD) and the highest level of education completed. In the 8th grade category, the sample size n = 382. For the 9 - 11th grade category the sample size is n = 784. For the high school category, the sample size is n = 1392. For the some college category, the sample size was 2083. The college graduate category had a sample size of n = 1981. The mean household income for those surveyed is \$57813, with a median of income of \$50000. The first quarter averages to \$30000 and the the third quarter of the data comes out to \$87500. All values reported are in U.S. dollars, For those completed 8th grade, the reported mean was 30445 and the median was 22500. For those that completed school between 9 to 11th grade, the mean was 39607 with a median of 30000. For those that completed up to high school, the mean was 47848 with a median of 40000. For those that have some college experience, the mean was 57753 with a median of 50000. For those that have graduated college, a mean of 77359 and a median of 875000 was reported. Considering the median of those surveyed was 50000, the groups that on average surpassed 50000 were those with some college and college graduates.
+
+```{r}
+#Visualization
+#Histogram
+NHANES_mod %>% 
+  ggplot( aes(x = Education)) + 
+  geom_bar(fill = "blue") + 
+  labs(
+    title = "Distribution of Education and HH Income", 
+    x = "Education",
+    y = "Income in USD",
+  ) + 
+  theme_bw()
+
+
+ggplot(NHANES_mod, aes(x=as.factor(Education), y=HHIncomeMid)) + geom_boxplot(fill = "green") +
+  ggtitle("Distribution of Education and HH Income") +
+  ylab("Income in USD") + 
+  xlab("Education Level") 
+
+```
+
+The histogram shows a general trend of how education impacts household income. The box plot gives detail on where most of the values skewed. The 8th grade column of the box plot shows a couple outliers, but the average income is still around 22500, with a range of income between 17500 and 40000. The rest of the groups do not show outliers and the median seems to have a trend of getting closer to the highest amount. The 9 - 11th grade box has a median line that appears around the quarter one mark of the box, with an income range between 17500 and 60000. The high school group and some college group has a median line around closer to the middle but still right under the half mark. The high school group has an income range of 22500 to 70000, while the some college group has an income range of 30000 to 87500. The college graduates group show an income range between 60000 and 87500.
+
+## Analysis
+
+```{r}
+
+#ANOVA
+anova1 <- aov(HHIncomeMid ~ Education, data = NHANES_mod)
+summary(anova1)
+
+```
+
+The choice of analysis used to compare the household income values with education level is a two-way ANOVA. A p-value of 2e-16 allows us to to reject the null hypothesis because it is below the standard of 0.5. The F value calculated is 419.6.
+
+## Conclusions
+
+We can confirm that there is a difference between categories of education milestones in terms of household income. The significantly low p-value test from the ANOVA analysis confirms rejection of the null hypothesis so the average household income does differ depending on education attainment. The F value of 419.6 supports evidence of that the means of the five categories provided deviate from each other. The p-value and F value considered in this case provide statistical evidence that each education category provides a different range of household income. So this supports the idea that as you further your education, you have a higher likelihood increasing household income. The data collected from the NHANES supports the theory that education pays, as mentioned by the U.S. Bureau of Labor Statistics (U.S. Bureau of Labor Statistics, 2025).
+
+**Citations**:
+
+Pruim, R. (2015). *NHANES: Data from the US National Health and Nutrition Examination Study* (Version 2.1.0). CRAN. [**https://cran.r-project.org/web/packages/NHANES/NHANES.pdf.**](https://cran.r-project.org/web/packages/NHANES/NHANES.pdf.)
+
+U.S. Bureau of Labor Statistics. (2025, August 28). *Education pays: Unemployment rates and earnings by educational attainment*. [**https://www.bls.gov/emp/tables/unemployment-earnings-education.htm.**](https://www.bls.gov/emp/tables/unemployment-earnings-education.htm.)
